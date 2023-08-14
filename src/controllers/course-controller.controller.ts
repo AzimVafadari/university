@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,8 +23,8 @@ import {CourseRepository} from '../repositories';
 export class CourseControllerController {
   constructor(
     @repository(CourseRepository)
-    public courseRepository : CourseRepository,
-  ) {}
+    public courseRepository: CourseRepository,
+  ) { }
 
   @post('/courses')
   @response(200, {
@@ -37,7 +37,7 @@ export class CourseControllerController {
         'application/json': {
           schema: getModelSchemaRef(Course, {
             title: 'NewCourse',
-            
+            exclude: ['id'],
           }),
         },
       },
@@ -86,7 +86,7 @@ export class CourseControllerController {
       content: {
         'application/json': {
           schema: getModelSchemaRef(Course, {partial: true}),
-        },
+        }, CourseControllerController
       },
     })
     course: Course,
@@ -105,7 +105,7 @@ export class CourseControllerController {
     },
   })
   async findById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @param.filter(Course, {exclude: 'where'}) filter?: FilterExcludingWhere<Course>
   ): Promise<Course> {
     return this.courseRepository.findById(id, filter);
@@ -116,7 +116,7 @@ export class CourseControllerController {
     description: 'Course PATCH success',
   })
   async updateById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +134,7 @@ export class CourseControllerController {
     description: 'Course PUT success',
   })
   async replaceById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody() course: Course,
   ): Promise<void> {
     await this.courseRepository.replaceById(id, course);
@@ -144,7 +144,7 @@ export class CourseControllerController {
   @response(204, {
     description: 'Course DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(@param.path.string('id') id: number): Promise<void> {
     await this.courseRepository.deleteById(id);
   }
 }

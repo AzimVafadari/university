@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,8 +23,8 @@ import {EnrollmentRepository} from '../repositories';
 export class EnrollmentControllerController {
   constructor(
     @repository(EnrollmentRepository)
-    public enrollmentRepository : EnrollmentRepository,
-  ) {}
+    public enrollmentRepository: EnrollmentRepository,
+  ) { }
 
   @post('/enrollments')
   @response(200, {
@@ -37,7 +37,7 @@ export class EnrollmentControllerController {
         'application/json': {
           schema: getModelSchemaRef(Enrollment, {
             title: 'NewEnrollment',
-            
+
           }),
         },
       },
@@ -105,7 +105,7 @@ export class EnrollmentControllerController {
     },
   })
   async findById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @param.filter(Enrollment, {exclude: 'where'}) filter?: FilterExcludingWhere<Enrollment>
   ): Promise<Enrollment> {
     return this.enrollmentRepository.findById(id, filter);
@@ -116,7 +116,7 @@ export class EnrollmentControllerController {
     description: 'Enrollment PATCH success',
   })
   async updateById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +134,7 @@ export class EnrollmentControllerController {
     description: 'Enrollment PUT success',
   })
   async replaceById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody() enrollment: Enrollment,
   ): Promise<void> {
     await this.enrollmentRepository.replaceById(id, enrollment);
@@ -144,7 +144,7 @@ export class EnrollmentControllerController {
   @response(204, {
     description: 'Enrollment DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(@param.path.string('id') id: number): Promise<void> {
     await this.enrollmentRepository.deleteById(id);
   }
 }

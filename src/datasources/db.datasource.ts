@@ -4,11 +4,11 @@ import {juggler} from '@loopback/repository';
 const config = {
   name: 'db',
   connector: 'mysql',
-  // url: 'http://localhost/phpmyadmin/index.php?route=/database/structure&db=db_university',
+  url: '',
   host: 'localhost',
   port: 3306,
-  user: 'Admin',
-  password: 'azim1234',
+  user: 'Azim_Admin',
+  password: 'azim123443218888',
   database: 'db_university'
 };
 

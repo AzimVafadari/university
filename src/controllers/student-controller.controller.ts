@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,8 +23,8 @@ import {StudentRepository} from '../repositories';
 export class StudentControllerController {
   constructor(
     @repository(StudentRepository)
-    public studentRepository : StudentRepository,
-  ) {}
+    public studentRepository: StudentRepository,
+  ) { }
 
   @post('/students')
   @response(200, {
@@ -37,7 +37,7 @@ export class StudentControllerController {
         'application/json': {
           schema: getModelSchemaRef(Student, {
             title: 'NewStudent',
-            
+
           }),
         },
       },
@@ -105,7 +105,7 @@ export class StudentControllerController {
     },
   })
   async findById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @param.filter(Student, {exclude: 'where'}) filter?: FilterExcludingWhere<Student>
   ): Promise<Student> {
     return this.studentRepository.findById(id, filter);
@@ -116,7 +116,7 @@ export class StudentControllerController {
     description: 'Student PATCH success',
   })
   async updateById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +134,7 @@ export class StudentControllerController {
     description: 'Student PUT success',
   })
   async replaceById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody() student: Student,
   ): Promise<void> {
     await this.studentRepository.replaceById(id, student);
@@ -144,7 +144,7 @@ export class StudentControllerController {
   @response(204, {
     description: 'Student DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(@param.path.string('id') id: number): Promise<void> {
     await this.studentRepository.deleteById(id);
   }
 }

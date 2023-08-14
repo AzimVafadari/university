@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,8 +23,8 @@ import {ProfessorRepository} from '../repositories';
 export class ProfessorControllerController {
   constructor(
     @repository(ProfessorRepository)
-    public professorRepository : ProfessorRepository,
-  ) {}
+    public professorRepository: ProfessorRepository,
+  ) { }
 
   @post('/professors')
   @response(200, {
@@ -37,7 +37,7 @@ export class ProfessorControllerController {
         'application/json': {
           schema: getModelSchemaRef(Professor, {
             title: 'NewProfessor',
-            
+
           }),
         },
       },
@@ -105,7 +105,7 @@ export class ProfessorControllerController {
     },
   })
   async findById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @param.filter(Professor, {exclude: 'where'}) filter?: FilterExcludingWhere<Professor>
   ): Promise<Professor> {
     return this.professorRepository.findById(id, filter);
@@ -116,7 +116,7 @@ export class ProfessorControllerController {
     description: 'Professor PATCH success',
   })
   async updateById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +134,7 @@ export class ProfessorControllerController {
     description: 'Professor PUT success',
   })
   async replaceById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody() professor: Professor,
   ): Promise<void> {
     await this.professorRepository.replaceById(id, professor);
@@ -144,7 +144,7 @@ export class ProfessorControllerController {
   @response(204, {
     description: 'Professor DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(@param.path.string('id') id: number): Promise<void> {
     await this.professorRepository.deleteById(id);
   }
 }

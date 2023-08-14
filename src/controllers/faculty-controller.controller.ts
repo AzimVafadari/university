@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,8 +23,8 @@ import {FacultyRepository} from '../repositories';
 export class FacultyControllerController {
   constructor(
     @repository(FacultyRepository)
-    public facultyRepository : FacultyRepository,
-  ) {}
+    public facultyRepository: FacultyRepository,
+  ) { }
 
   @post('/faculties')
   @response(200, {
@@ -37,7 +37,7 @@ export class FacultyControllerController {
         'application/json': {
           schema: getModelSchemaRef(Faculty, {
             title: 'NewFaculty',
-            
+
           }),
         },
       },
@@ -105,7 +105,7 @@ export class FacultyControllerController {
     },
   })
   async findById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @param.filter(Faculty, {exclude: 'where'}) filter?: FilterExcludingWhere<Faculty>
   ): Promise<Faculty> {
     return this.facultyRepository.findById(id, filter);
@@ -116,7 +116,7 @@ export class FacultyControllerController {
     description: 'Faculty PATCH success',
   })
   async updateById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +134,7 @@ export class FacultyControllerController {
     description: 'Faculty PUT success',
   })
   async replaceById(
-    @param.path.string('id') id: string,
+    @param.path.string('id') id: number,
     @requestBody() faculty: Faculty,
   ): Promise<void> {
     await this.facultyRepository.replaceById(id, faculty);
@@ -144,7 +144,7 @@ export class FacultyControllerController {
   @response(204, {
     description: 'Faculty DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(@param.path.string('id') id: number): Promise<void> {
     await this.facultyRepository.deleteById(id);
   }
 }
