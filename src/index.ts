@@ -1,6 +1,6 @@
 import {ApplicationConfig, UniversityApplication} from './application';
 
-export * from './application';
+export {UniversityApplication} from './application';
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new UniversityApplication(options);
