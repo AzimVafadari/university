@@ -1,14 +1,8 @@
-// Copyright IBM Corp. and LoopBack contributors 2020. All Rights Reserved.
-// Node module: @loopback/example-todo-jwt
-// This file is licensed under the MIT License.
-// License text available at https://opensource.org/licenses/MIT
-
 import {authenticate, TokenService} from '@loopback/authentication';
 import {
   Credentials,
   MyUserService,
   TokenServiceBindings,
-  User,
   UserRepository,
   UserServiceBindings,
 } from '@loopback/authentication-jwt';
@@ -17,6 +11,7 @@ import {model, property, repository} from '@loopback/repository';
 import {
   get,
   getModelSchemaRef,
+  HttpErrors,
   post,
   requestBody,
   SchemaObject,
@@ -24,9 +19,12 @@ import {
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
+import {Student} from '../models';
+import {StudentRepository} from '../repositories';
+import {compare} from 'bcryptjs';
 
 @model()
-export class NewUserRequest extends User {
+export class NewStudentRequest extends Student {
   @property({
     type: 'string',
     required: true,
@@ -41,11 +39,10 @@ const CredentialsSchema: SchemaObject = {
     email: {
       type: 'string',
       format: 'email',
-
     },
     password: {
       type: 'string',
-      minLength: 8,
+      minLength: 6,
     },
   },
 };
@@ -58,7 +55,7 @@ export const CredentialsRequestBody = {
   },
 };
 
-export class UserController {
+export class StudentController {
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public jwtService: TokenService,
@@ -67,7 +64,10 @@ export class UserController {
     @inject(SecurityBindings.USER, {optional: true})
     public user: UserProfile,
     @repository(UserRepository) protected userRepository: UserRepository,
+    @repository(StudentRepository) protected studentRepository: StudentRepository,
   ) {}
+
+  // This decorator is for login
 
   @post('/students/login', {
     responses: {
@@ -88,49 +88,49 @@ export class UserController {
       },
     },
   })
+  // And the method is here
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
   ): Promise<{token: string}> {
-    // ensure the user exists, and the password is correct
-    const user = await this.userService.verifyCredentials(credentials);
-    // convert a User object into a UserProfile object (reduced set of properties)
-    const userProfile = this.userService.convertToUserProfile(user);
+    // Find the student based on the provided email
+    const student = await this.studentRepository.findOne({
+      where: {email: credentials.email},
+    });
 
-    // create a JSON Web Token based on the user profile
+    if (!student) {
+      throw new HttpErrors.NotFound('Student not found');
+    }
+
+    // Verify if the provided password matches the hashed password stored in the database
+    const passwordMatched = await compare(credentials.password, student.password);
+
+    if (!passwordMatched) {
+      throw new HttpErrors.Unauthorized('Incorrect password');
+    }
+
+    // Convert a Student object into a UserProfile object
+    const userProfile: UserProfile = {
+      [securityId]: student.studentId.toString(), // Convert to string
+      id: student.studentId.toString(), // Convert to string
+      name: `${student.firstName} ${student.lastName}`,
+      email: student.email,
+      // Add any other properties you need
+    };
+
+    // Generate a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
+
     return {token};
   }
 
-  @authenticate('jwt')
-  @get('/whoAmI', {
+  @post('/students/signup', {
     responses: {
       '200': {
-        description: 'Return current user',
+        description: 'Student',
         content: {
           'application/json': {
             schema: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    },
-  })
-  async whoAmI(
-    @inject(SecurityBindings.USER)
-    currentUserProfile: UserProfile,
-  ): Promise<string> {
-    return currentUserProfile[securityId];
-  }
-
-  @post('/signup', {
-    responses: {
-      '200': {
-        description: 'User',
-        content: {
-          'application/json': {
-            schema: {
-              'x-ts-type': User,
+              'x-ts-type': Student,
             },
           },
         },
@@ -141,21 +141,26 @@ export class UserController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(NewUserRequest, {
-            title: 'NewUser',
+          schema: getModelSchemaRef(NewStudentRequest, {
+            title: 'NewStudent',
           }),
         },
       },
     })
-    newUserRequest: NewUserRequest,
-  ): Promise<User> {
-    const password = await hash(newUserRequest.password, await genSalt());
-    const savedUser = await this.userRepository.create(
-      _.omit(newUserRequest, 'password'),
+    newStudentRequest: NewStudentRequest,
+  ): Promise<Student> {
+    const password = await hash(newStudentRequest.password, await genSalt());
+
+    // Create a new student with hashed password
+    const savedStudent = await this.studentRepository.create(
+      _.omit(newStudentRequest, 'password'),
     );
 
-    await this.userRepository.userCredentials(savedUser.id).create({password});
+    // Save the hashed password to your student credentials (adjust as per your model structure)
+    await this.studentRepository.updateById(savedStudent.studentId, {
+      password: password,
+    });
 
-    return savedUser;
+    return savedStudent;
   }
 }

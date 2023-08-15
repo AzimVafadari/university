@@ -1,7 +1,8 @@
+import {User} from '@loopback/authentication-jwt';
 import {Entity, model, property} from '@loopback/repository';
 
 @model({settings: {strict: false}})
-export class Student extends Entity {
+export class Student extends Entity{
   @property({
     type: 'number',
     id: true,
@@ -43,6 +44,11 @@ export class Student extends Entity {
     required: true,
   })
   facultyId: string;
+  @property({
+    type: 'string',
+    required: true,
+  })
+  password: string;
 
   // Define well-known properties here
 
