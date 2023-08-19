@@ -44,11 +44,11 @@ export class Student extends Entity{
     required: true,
   })
   facultyId: string;
-  @property({
-    type: 'string',
-    required: true,
-  })
-  password: string;
+  // @property({
+  //   type: 'string',
+  //   required: true,
+  // })
+  // password: string;
 
   // Define well-known properties here
 
