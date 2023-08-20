@@ -1,4 +1,3 @@
-import {User} from '@loopback/authentication-jwt';
 import {Entity, model, property} from '@loopback/repository';
 
 @model({settings: {strict: false}})

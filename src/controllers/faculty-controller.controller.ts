@@ -3,6 +3,8 @@ import {
   CountSchema,
   Filter,
   FilterExcludingWhere,
+  model,
+  property,
   repository,
   Where,
 } from '@loopback/repository';
@@ -10,6 +12,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -17,13 +20,38 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
+import {
+  MyUserService,
+} from '@loopback/authentication-jwt';
 import {Faculty} from '../models';
 import {FacultyRepository} from '../repositories';
+import {CredentialsRequestBody} from './student-controller.controller';
+import {Credentials, TokenServiceBindings, UserRepository, UserServiceBindings} from '@loopback/authentication-jwt';
+import {NewProfessorRequest} from './professor-controller.controller';
+import {genSalt, hash} from 'bcryptjs';
+import _ from 'lodash';
+import {inject} from '@loopback/core';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
+import {TokenService} from '@loopback/authentication';
+@model()
+export class NewFacultyRequest extends Faculty {
+  @property({
+    type: 'string',
+    required: true,
+  })
+  password: string;
+}
 
 export class FacultyControllerController {
   constructor(
-    @repository(FacultyRepository)
-    public facultyRepository: FacultyRepository,
+    @inject(TokenServiceBindings.TOKEN_SERVICE)
+    public jwtService: TokenService,
+    @inject(UserServiceBindings.USER_SERVICE)
+    public userService: MyUserService,
+    @inject(SecurityBindings.USER, {optional: true})
+    public user: UserProfile,
+    @repository(UserRepository) protected userRepository: UserRepository,
+    @repository(FacultyRepository) protected facultyRepository: FacultyRepository,
   ) { }
 
   @post('/faculties')
@@ -147,4 +175,46 @@ export class FacultyControllerController {
   async deleteById(@param.path.string('id') id: number): Promise<void> {
     await this.facultyRepository.deleteById(id);
   }
+
+  @post('/faculties/register', {
+    responses: {
+      '200': {
+        description: 'faculty',
+        content: {
+          'application/json': {
+            schema: {
+              'x-ts-type': Faculty,
+            },
+          },
+        },
+      },
+    },
+  })
+  async signUp(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Faculty, {
+            title: 'NewStudent',
+          }),
+        },
+      },
+    })
+    newFacultyRequest: Faculty,
+  ): Promise<Faculty> {
+    const password = await hash(newFacultyRequest.password, await genSalt());
+
+    // Create a new student with hashed password
+    const savedFaculty = await this.facultyRepository.create(
+      _.omit(newFacultyRequest, 'password'),
+    );
+
+    // Save the hashed password to your student credentials (adjust as per your model structure)
+    // await this.professorRepository.updateById(savedProfessor.id, {
+    //   password: password,
+    // });
+
+    return savedFaculty;
+  }
 }
+

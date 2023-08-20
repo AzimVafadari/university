@@ -17,35 +17,89 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {Course} from '../models';
+import {inject} from '@loopback/core';
+import {model, property} from '@loopback/repository';
+import {
+  HttpErrors,
+  SchemaObject,
+} from '@loopback/rest';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
+import {genSalt, hash} from 'bcryptjs';
+import _ from 'lodash';
+import {compare} from 'bcryptjs';
+import {Credentials, MyUserService, TokenServiceBindings, UserRepository, UserServiceBindings} from '@loopback/authentication-jwt';
+import {TokenService} from '@loopback/authentication';
 import {CourseRepository} from '../repositories';
+import {Course} from '../models';
+export type CustomCredentials = {
+  code: string;
+  password: string;
+};
+
+// create NewProfessorRequest model
+@model()
+export class NewCourseRequest extends Course {
+  @property({
+    type: 'string',
+    required: true,
+  })
+  password: string;
+}
+//create CredentialsSchema
+const CredentialsSchema: SchemaObject = {
+  type: 'object',
+  required: ['code', 'password'],
+  properties: {
+    code: {
+      type: 'string',
+    },
+    password: {
+      type: 'string',
+      minLength: 3,
+    },
+  },
+};
+const CredentialsRequestBody = {
+  description: 'The input of login function',
+  required: true,
+  content: {
+    'application/json': {schema: CredentialsSchema},
+  },
+};
+
 
 export class CourseControllerController {
   constructor(
-    @repository(CourseRepository)
-    public courseRepository: CourseRepository,
+    @inject(TokenServiceBindings.TOKEN_SERVICE)
+    public jwtService: TokenService,
+    @inject(UserServiceBindings.USER_SERVICE)
+    public userService: MyUserService,
+    @inject(SecurityBindings.USER, {optional: true})
+    public user: UserProfile,
+    @repository(UserRepository) protected userRepository: UserRepository,
+    @repository(CourseRepository) protected courseRepository: CourseRepository,
   ) { }
 
-  @post('/courses')
-  @response(200, {
-    description: 'Course model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Course)}},
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Course, {
-            title: 'NewCourse',
-            exclude: ['id'],
-          }),
-        },
-      },
-    })
-    course: Course,
-  ): Promise<Course> {
-    return this.courseRepository.create(course);
-  }
+  // @post('/courses')
+  // @response(200, {
+  //   description: 'Course model instance',
+  //   content: {'application/json': {schema: getModelSchemaRef(Course)}},
+  // })
+  // async create(
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Course, {
+  //           title: 'NewCourse',
+  //           exclude: ['id'],
+  //         }),
+  //       },
+  //     },
+  //   })
+  //   course: Course,
+  // ): Promise<Course> {
+  //   return this.courseRepository.create(course);
+  // }
 
   @get('/courses/count')
   @response(200, {
@@ -146,5 +200,109 @@ export class CourseControllerController {
   })
   async deleteById(@param.path.string('id') id: number): Promise<void> {
     await this.courseRepository.deleteById(id);
+  }
+  // This decorator is for login
+
+  // @post('/courses/login', {
+  //   responses: {
+  //     '200': {
+  //       description: 'Token',
+  //       content: {
+  //         'application/json': {
+  //           schema: {
+  //             type: 'object',
+  //             properties: {
+  //               token: {
+  //                 type: 'string',
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // })
+  // // And the method is here(120022)
+
+  // async login(
+  //   @requestBody(CredentialsRequestBody) credentials: CustomCredentials,
+  //   ): Promise<{ token: string }> {
+  //     // Find the course based on the provided code
+  //     const course = await this.courseRepository.findOne({
+  //       where: { code: credentials.code },
+  //     });
+
+  //   if (!course) {
+  //     throw new HttpErrors.NotFound('Course not found');
+  //   }
+
+  //   // Verify if the provided password matches the hashed password stored in the database
+  //   const passwordMatched = await compare(
+  //     credentials.code,
+  //     course.password
+  //   );
+
+  //   if (!passwordMatched) {
+  //     throw new HttpErrors.Unauthorized('Incorrect password');
+  //   }
+
+  //   // Convert a course object into a UserProfile object
+  //   const userProfile: UserProfile = {
+  //     [securityId]: course.code, // Convert to string
+  //     id: course.id, // Convert to string
+  //     // Adjust the properties based on your Course model structure
+  //     // For example: name: course.name
+  //     name: course.name,
+  //     code: course.code,
+  //     description: course.description,
+  //     credits: course.credits,
+  //     facultyId: course.facultyId
+  //   };
+
+  //   // Generate a JSON Web Token based on the user profile
+  //   const token = await this.jwtService.generateToken(userProfile);
+
+  //   return { token };
+  // }
+
+  @post('/courses/register', {
+    responses: {
+      '200': {
+        description: 'Course',
+        content: {
+          'application/json': {
+            schema: {
+              'x-ts-type': Course,
+            },
+          },
+        },
+      },
+    },
+  })
+  async signUp(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(NewCourseRequest, {
+            title: 'NewCourse',
+          }),
+        },
+      },
+    })
+    newCourseRequest: NewCourseRequest,
+  ): Promise<Course> {
+    const password = await hash(newCourseRequest.password, await genSalt());
+
+    // Create a new student with hashed password
+    const savedCourse = await this.courseRepository.create(
+      _.omit(newCourseRequest, 'password'),
+    );
+
+    // Save the hashed password to your student credentials (adjust as per your model structure)
+    // await this.courseRepository.updateById(savedCourse.id, {
+    //   password: password,
+    // });
+
+    return savedCourse;
   }
 }

@@ -1,5 +1,4 @@
 import {Entity, model, property, hasMany} from '@loopback/repository';
-import {Professor} from './professor.model';
 
 @model({settings: {strict: false}})
 export class Faculty extends Entity {
@@ -38,8 +37,7 @@ export class Faculty extends Entity {
   })
   location: string;
 
-  @hasMany(() => Professor)
-  professors: Professor[];
+
   // Define well-known properties here
 
   // Indexer property to allow additional data

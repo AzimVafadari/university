@@ -1,31 +1,31 @@
 import {Entity, model, property} from '@loopback/repository';
-import {User} from '@loopback/authentication-jwt';
 
 @model({settings: {strict: false}})
-export class Professor extends User {
+export class Manager extends Entity {
   @property({
-    type: 'string',
-    required: true,
+    type: 'number',
+    id: true,
+    generated: true,
   })
-  firstName: string;
+  id?: number;
 
   @property({
     type: 'string',
     required: true,
   })
-  lastName: string;
+  name: string;
+
   @property({
     type: 'string',
     required: true,
   })
-  specialization: string;
+  password: string;
 
-  // @property({
-  //   type: 'string',
-  //   required: true,
-  // })
-  // password: string
-
+  @property({
+    type: 'string',
+    required: true,
+  })
+  role: string;
 
   // Define well-known properties here
 
@@ -33,13 +33,13 @@ export class Professor extends User {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;
 
-  constructor(data?: Partial<Professor>) {
+  constructor(data?: Partial<Manager>) {
     super(data);
   }
 }
 
-export interface ProfessorRelations {
+export interface ManagerRelations {
   // describe navigational properties here
 }
 
-export type ProfessorWithRelations = Professor & ProfessorRelations;
+export type ManagerWithRelations = Manager & ManagerRelations;
