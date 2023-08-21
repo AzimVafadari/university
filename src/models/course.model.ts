@@ -49,6 +49,31 @@ export class Course extends Entity {
   })
   units: number;
 
+  @property({
+    type: 'string',
+    required: true
+  })
+  startTime: string;
+
+  @property({
+    type: 'string',
+    required: true
+  })
+  endTime: string;
+
+
+  @property({
+    type: 'string',
+    required: true
+  })
+  Days: string[];
+
+  @property({
+    type: 'string',
+    required: true
+  })
+  semester: string;
+
   @belongsTo(() => Professor)
   professorId: number;
 

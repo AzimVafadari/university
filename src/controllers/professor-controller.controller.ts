@@ -264,10 +264,10 @@ export class ProfessorControllerController {
     @requestBody({
       content: {
         'application/json': {
-          schema2: getModelSchemaRef(NewProfessorRequest, {
+          schema: getModelSchemaRef(NewProfessorRequest, {
             title: 'NewStudent',
             partial: true,
-            exclude: ['id', 'realm', '']
+            exclude: ['id', 'realm']
           }),
         },
       },
@@ -278,7 +278,7 @@ export class ProfessorControllerController {
 
     // Create a new student with hashed password
     const savedProfessor = await this.professorRepository.create(
-      _.omit(newProfessorRequest, 'password'),
+      _.omit(newProfessorRequest, 'password', 'id', 'realm'),
     );
 
     // Save the hashed password to your student credentials (adjust as per your model structure)
