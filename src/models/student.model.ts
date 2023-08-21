@@ -45,6 +45,12 @@ export class Student extends Entity{
   })
   facultyId: string;
 
+  @property({
+    type: 'number',
+    required: true,
+  })
+  average: number;
+
   @hasMany(() => Course)
   courses: Course[];
   // @property({
