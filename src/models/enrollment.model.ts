@@ -14,6 +14,7 @@ export class Enrollment extends Entity {
   })
   studentId: string;
 
+
   @property({
     type: 'string',
     required: true,
