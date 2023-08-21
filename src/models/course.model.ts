@@ -42,6 +42,12 @@ export class Course extends Entity {
   })
   studentId?: number;
 
+  @property({
+    type: 'number',
+    required: true
+  })
+  units: number;
+
   @belongsTo(() => Professor)
   professorId: number;
   // Define well-known properties here
