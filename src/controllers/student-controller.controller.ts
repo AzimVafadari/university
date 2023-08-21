@@ -228,9 +228,9 @@ export class StudentController {
     }
 
     // Verify if the provided password matches the hashed password stored in the database
-    const passwordMatched = await compare(credentials.password, student.password);
+    // const passwordMatched = await compare();
 
-    if (! passwordMatched) {
+    if (credentials.password !== student.password) {
       throw new HttpErrors.Unauthorized('Incorrect password');
     }
 
