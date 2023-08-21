@@ -230,19 +230,20 @@ export class StudentController {
     // Verify if the provided password matches the hashed password stored in the database
     const passwordMatched = await compare(credentials.password, student.password);
 
-    if (!passwordMatched) {
+    if (! passwordMatched) {
       throw new HttpErrors.Unauthorized('Incorrect password');
     }
 
     // Convert a Student object into a UserProfile object
-    const userProfile: UserProfile = {
-      [securityId]: student.studentId.toString(), // Convert to string
-      id: student.studentId.toString(), // Convert to string
-      name: `${student.firstName} ${student.lastName}`,
-      email: student.email,
-      // Add any other properties you need
-    };
+    // const userProfile: UserProfile = {
+    //   [securityId]: student.studentId.toString(), // Convert to string
+    //   id: student.studentId.toString(), // Convert to string
+    //   name: `${student.firstName} ${student.lastName}`,
+    //   email: student.email,
+    //   // Add any other properties you need
+    // };
 
+    const userProfile = this.userService.convertToUserProfile(student as any)
     // Generate a JSON Web Token based on the user profile
     const token = await this.jwtService.generateToken(userProfile);
 
