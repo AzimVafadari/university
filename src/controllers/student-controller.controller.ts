@@ -1,4 +1,4 @@
-import {authenticate, TokenService} from '@loopback/authentication';
+import {authenticate, TokenService,} from '@loopback/authentication';
 import {
   Credentials,
   MyUserService,
@@ -248,6 +248,7 @@ export class StudentController {
     return {token};
   }
 
+  @post('/students/signup')
   @post('/students/signup', {
     responses: {
       '200': {
