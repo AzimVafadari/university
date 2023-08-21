@@ -12,3 +12,5 @@ export * from './faculty-manager.controller';
 export * from './manager-faculty.controller';
 export * from './professor-course.controller';
 export * from './course-professor.controller';
+export * from './enrollment-course.controller';
+export * from './enrollment-student.controller';
