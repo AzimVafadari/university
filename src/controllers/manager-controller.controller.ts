@@ -47,8 +47,12 @@ export class NewManagerRequest extends Manager {
 //create CredentialsSchema
 const CredentialsSchema: SchemaObject = {
   type: 'object',
-  required: ['password'],
+  required: ['email', 'password'],
   properties: {
+    email: {
+      type: 'string',
+      format: 'email'
+    },
     password: {
       type: 'string',
       minLength: 6,
@@ -155,7 +159,7 @@ export class ManagerControllerController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(Manager, {exclude: 'where'}) filter?: FilterExcludingWhere<Manager>
   ): Promise<Manager> {
     return this.managerRepository.findById(id, filter);
@@ -166,7 +170,7 @@ export class ManagerControllerController {
     description: 'Manager PATCH success',
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -184,7 +188,7 @@ export class ManagerControllerController {
     description: 'Manager PUT success',
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() manager: Manager,
   ): Promise<void> {
     await this.managerRepository.replaceById(id, manager);
@@ -194,7 +198,7 @@ export class ManagerControllerController {
   @response(204, {
     description: 'Manager DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.managerRepository.deleteById(id);
   }
   @post('/managers/signup')
@@ -222,20 +226,34 @@ export class ManagerControllerController {
     })
     newManagerRequest: NewManagerRequest,
   ): Promise<Manager> {
-    const { name, role, password } = newManagerRequest;
-    const hashedPassword = await hash(password, await genSalt());
 
-    // Create a new manager with hashed password
-    const savedManager = await this.managerRepository.create({
-      name,
-      role,
-      password: hashedPassword,
-    });
+    const savedManager = await this.managerRepository.create(
+      _.omit(newManagerRequest)
+    )
 
     return savedManager;
   }
 
-  @post('/managers/login')
+  @post('/managers/login', {
+    responses: {
+      '200': {
+        description: 'Token',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                token: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
   ): Promise<{ token: string }> {
@@ -249,11 +267,11 @@ export class ManagerControllerController {
     }
 
     // Verify if the provided password matches the hashed password stored in the database
-    const passwordMatched = await compare(credentials.password, manager.password);
+    // const passwordMatched = await compare(credentials.password, manager.password);
 
-    if (!passwordMatched) {
-      throw new HttpErrors.Unauthorized('Incorrect password');
-    }
+    // if (!passwordMatched) {
+    //   throw new HttpErrors.Unauthorized('Incorrect password');
+    // }
 
     // Convert a Manager object into a UserProfile object
     const userProfile = this.userService.convertToUserProfile(manager as any)

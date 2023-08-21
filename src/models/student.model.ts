@@ -32,6 +32,12 @@ export class Student extends Entity{
     type: 'string',
     required: true,
   })
+  password: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
   StudentId: string;
 
   @property({

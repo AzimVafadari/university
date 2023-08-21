@@ -25,7 +25,7 @@ import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
 import {Manager, Student} from '../models';
-import {StudentRepository} from '../repositories';
+import {ManagerRepository, StudentRepository} from '../repositories';
 import {compare} from 'bcryptjs';
 
 @model()
@@ -70,6 +70,7 @@ export class StudentController {
     public user: UserProfile,
     @repository(UserRepository) protected userRepository: UserRepository,
     @repository(StudentRepository) protected studentRepository: StudentRepository,
+    @repository(ManagerRepository) protected managerRepository: ManagerRepository,
   ) {}
   //    @post('/students')
   // @response(200, {
@@ -247,8 +248,7 @@ export class StudentController {
 
     return {token};
   }
-
-  @post('/students/signup')
+  @authenticate('jwt')
   @post('/students/signup', {
     responses: {
       '200': {
@@ -276,19 +276,27 @@ export class StudentController {
       },
     })
     newStudentRequest: NewStudentRequest,
-  ): Promise<Student> {
+    @inject(SecurityBindings.USER)
+    currentUserProfile: UserProfile,
+  ): Promise<any> {
+    const find = await this.managerRepository.findById(currentUserProfile[securityId] as any)
     const password = await hash(newStudentRequest.password, await genSalt());
-
-    // Create a new student with hashed password
     const savedStudent = await this.studentRepository.create(
       newStudentRequest
     );
+    if(find.role === "minor"){
+      return savedStudent;
+    }
+    else{
+      throw new HttpErrors.NotFound('Manager is not minor');
+    }
+    // Create a new student with hashed password
 
     // Save the hashed password to your student credentials (adjust as per your model structure)
     // await this.studentRepository.updateById(savedStudent.studentId, {
     //   password: password,
     // });
 
-    return savedStudent;
+
   }
 }

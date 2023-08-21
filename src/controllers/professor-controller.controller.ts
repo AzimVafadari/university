@@ -264,7 +264,7 @@ export class ProfessorControllerController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(NewProfessorRequest, {
+          schem1a: getModelSchemaRef(NewProfessorRequest, {
             title: 'NewStudent',
             partial: true,
             exclude: ['id', 'realm']

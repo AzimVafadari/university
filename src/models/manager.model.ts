@@ -1,14 +1,9 @@
 import {Entity, model, property, belongsTo} from '@loopback/repository';
 import {Faculty} from './faculty.model';
+import {User} from '@loopback/authentication-jwt';
 
 @model({settings: {strict: true}})
-export class Manager extends Entity {
-  @property({
-    type: 'number',
-    id: true,
-    generated: true,
-  })
-  id?: number;
+export class Manager extends User {
 
   @property({
     type: 'string',
