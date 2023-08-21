@@ -2,7 +2,7 @@ import {Entity, model, property, hasMany} from '@loopback/repository';
 import {User} from '@loopback/authentication-jwt';
 import {Course} from './course.model';
 
-@model({settings: {strict: false}})
+@model({settings: {strict: true}})
 export class Professor extends User {
   @property({
     type: 'string',

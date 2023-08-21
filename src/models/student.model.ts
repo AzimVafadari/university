@@ -1,7 +1,7 @@
 import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Course} from './course.model';
 
-@model({settings: {strict: false}})
+@model({settings: {strict: true}})
 export class Student extends Entity{
   @property({
     type: 'number',

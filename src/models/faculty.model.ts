@@ -3,7 +3,7 @@ import {Course} from './course.model';
 import {Professor} from './professor.model';
 import {Manager} from './manager.model';
 
-@model({settings: {strict: false}})
+@model({settings: {strict: true}})
 export class Faculty extends Entity {
   @property({
     type: 'number',
