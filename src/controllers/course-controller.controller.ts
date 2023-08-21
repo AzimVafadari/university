@@ -285,6 +285,8 @@ export class CourseControllerController {
         'application/json': {
           schema: getModelSchemaRef(NewCourseRequest, {
             title: 'NewCourse',
+            partial:true,
+            exclude: ['id']
           }),
         },
       },

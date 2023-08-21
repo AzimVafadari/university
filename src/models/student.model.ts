@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Course} from './course.model';
 
 @model({settings: {strict: false}})
 export class Student extends Entity{
@@ -43,6 +44,9 @@ export class Student extends Entity{
     required: true,
   })
   facultyId: string;
+
+  @hasMany(() => Course)
+  courses: Course[];
   // @property({
   //   type: 'string',
   //   required: true,

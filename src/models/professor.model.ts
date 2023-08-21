@@ -1,5 +1,6 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasMany} from '@loopback/repository';
 import {User} from '@loopback/authentication-jwt';
+import {Course} from './course.model';
 
 @model({settings: {strict: false}})
 export class Professor extends User {
@@ -20,6 +21,13 @@ export class Professor extends User {
   })
   specialization: string;
 
+  @property({
+    type: 'number',
+  })
+  facultyId?: number;
+
+  @hasMany(() => Course)
+  courses: Course[];
   // @property({
   //   type: 'string',
   //   required: true,

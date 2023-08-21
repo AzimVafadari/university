@@ -194,13 +194,15 @@ export class FacultyControllerController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Faculty, {
+          schema: getModelSchemaRef(NewFacultyRequest, {
             title: 'NewStudent',
+            partial:true,
+            exclude: ['id', 'passwprd']
           }),
         },
       },
     })
-    newFacultyRequest: Faculty,
+    newFacultyRequest: NewFacultyRequest,
   ): Promise<Faculty> {
     const password = await hash(newFacultyRequest.password, await genSalt());
 

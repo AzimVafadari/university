@@ -214,6 +214,8 @@ export class ManagerControllerController {
         'application/json': {
           schema: getModelSchemaRef(NewManagerRequest, {
             title: 'NewManager',
+            partial: true,
+            exclude: ['id']
           }),
         },
       },

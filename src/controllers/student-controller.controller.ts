@@ -268,7 +268,8 @@ export class StudentController {
         'application/json': {
          schema: getModelSchemaRef(NewStudentRequest, {
             title: 'Newstudent',
-
+            partial: true,
+            exclude: ['id']
           }),
         },
       },

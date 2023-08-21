@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Faculty} from './faculty.model';
 
 @model({settings: {strict: false}})
 export class Manager extends Entity {
@@ -27,6 +28,8 @@ export class Manager extends Entity {
   })
   role: string;
 
+  @belongsTo(() => Faculty)
+  facultyId: number;
   // Define well-known properties here
 
   // Indexer property to allow additional data
