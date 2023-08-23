@@ -17,6 +17,11 @@ export class Enrollment extends Entity {
   })
   enrollmentDate: string;
 
+  @property({
+    type: 'binary', // Use 'binary' data type for image
+  })
+  image?: Buffer; // Store the image as a Buffer
+
   @belongsTo(() => Course)
   courseId: number;
 

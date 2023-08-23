@@ -26,7 +26,6 @@ import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
 import {Manager, Student} from '../models';
 import {ManagerRepository, StudentRepository} from '../repositories';
-
 const CredentialsSchema: SchemaObject = {
   type: 'object',
   required: ['email', 'password'],
@@ -62,26 +61,6 @@ export class StudentController {
     @repository(StudentRepository) protected studentRepository: StudentRepository,
     @repository(ManagerRepository) protected managerRepository: ManagerRepository,
   ) {}
-  //    @post('/students')
-  // @response(200, {
-  //   description: 'student model instance',
-  //   content: {'application/json': {schema: getModelSchemaRef(Student)}},
-  // })
-  // async create(
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Student, {
-  //           title: 'Newstudent',
-
-  //         }),
-  //       },
-  //     },
-  //   })
-  //   student: Student,
-  // ): Promise<Student> {
-  //   return this.studentRepository.create(student);
-  // }
 
   @get('/students/count')
   @response(200, {
@@ -217,21 +196,9 @@ export class StudentController {
       throw new HttpErrors.NotFound('Student not found');
     }
 
-    // Verify if the provided password matches the hashed password stored in the database
-    // const passwordMatched = await compare();
-
     if (credentials.password !== student.password) {
       throw new HttpErrors.Unauthorized('Incorrect password');
     }
-
-    // Convert a Student object into a UserProfile object
-    // const userProfile: UserProfile = {
-    //   [securityId]: student.studentId.toString(), // Convert to string
-    //   id: student.studentId.toString(), // Convert to string
-    //   name: `${student.firstName} ${student.lastName}`,
-    //   email: student.email,
-    //   // Add any other properties you need
-    // };
 
     const userProfile = this.userService.convertToUserProfile(student as any)
     // Generate a JSON Web Token based on the user profile
@@ -282,13 +249,5 @@ export class StudentController {
     else{
       throw new HttpErrors.NotFound('Manager is not minor');
     }
-    // Create a new student with hashed password
-
-    // Save the hashed password to your student credentials (adjust as per your model structure)
-    // await this.studentRepository.updateById(savedStudent.studentId, {
-    //   password: password,
-    // });
-
-
   }
 }
