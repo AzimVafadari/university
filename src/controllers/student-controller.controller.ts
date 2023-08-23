@@ -28,14 +28,6 @@ import {Manager, Student} from '../models';
 import {ManagerRepository, StudentRepository} from '../repositories';
 import {compare} from 'bcryptjs';
 
-@model()
-export class NewStudentRequest extends Student {
-  @property({
-    type: 'string',
-    required: true,
-  })
-  password: string;
-}
 
 const CredentialsSchema: SchemaObject = {
   type: 'object',
@@ -228,13 +220,17 @@ export class StudentController {
     }
 
     // Verify if the provided password matches the hashed password stored in the database
+<<<<<<< HEAD
     // const passwordMatched = await compare();
+=======
+>>>>>>> 3736600 (The signup and login methods for student is ok.)
 
     if (credentials.password !== student.password) {
       throw new HttpErrors.Unauthorized('Incorrect password');
     }
 
     // Convert a Student object into a UserProfile object
+<<<<<<< HEAD
     // const userProfile: UserProfile = {
     //   [securityId]: student.studentId.toString(), // Convert to string
     //   id: student.studentId.toString(), // Convert to string
@@ -242,6 +238,9 @@ export class StudentController {
     //   email: student.email,
     //   // Add any other properties you need
     // };
+=======
+    const userProfile = this.userService.convertToUserProfile(student as any)
+>>>>>>> 3736600 (The signup and login methods for student is ok.)
 
     const userProfile = this.userService.convertToUserProfile(student as any)
     // Generate a JSON Web Token based on the user profile
@@ -249,7 +248,11 @@ export class StudentController {
 
     return {token};
   }
+<<<<<<< HEAD
   @authenticate('jwt')
+=======
+
+>>>>>>> 3736600 (The signup and login methods for student is ok.)
   @post('/students/signup', {
     responses: {
       '200': {
@@ -268,7 +271,7 @@ export class StudentController {
     @requestBody({
       content: {
         'application/json': {
-         schema: getModelSchemaRef(NewStudentRequest, {
+         schema: getModelSchemaRef(Student, {
             title: 'Newstudent',
             partial: true,
             exclude: ['id']
@@ -276,6 +279,7 @@ export class StudentController {
         },
       },
     })
+<<<<<<< HEAD
     newStudentRequest: NewStudentRequest,
     @inject(SecurityBindings.USER)
     currentUserProfile: UserProfile,
@@ -292,6 +296,15 @@ export class StudentController {
       throw new HttpErrors.NotFound('Manager is not minor');
     }
     // Create a new student with hashed password
+=======
+    student: Student,
+  ): Promise<Student> {
+    const password = await hash(student.password, await genSalt());
+    student.password = password;
+
+    // Create a new student with hashed password
+    const savedStudent = await this.studentRepository.create(student);
+>>>>>>> 3736600 (The signup and login methods for student is ok.)
 
     // Save the hashed password to your student credentials (adjust as per your model structure)
     // await this.studentRepository.updateById(savedStudent.studentId, {
