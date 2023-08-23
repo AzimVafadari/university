@@ -19,6 +19,11 @@ export class Professor extends User {
     type: 'string',
     required: true,
   })
+  password: string;
+  @property({
+    type: 'string',
+    required: true,
+  })
   specialization: string;
 
   @property({

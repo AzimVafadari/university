@@ -27,7 +27,6 @@ import {Faculty} from '../models';
 import {FacultyRepository} from '../repositories';
 import {CredentialsRequestBody} from './student-controller.controller';
 import {Credentials, TokenServiceBindings, UserRepository, UserServiceBindings} from '@loopback/authentication-jwt';
-import {NewProfessorRequest} from './professor-controller.controller';
 import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
 import {inject} from '@loopback/core';

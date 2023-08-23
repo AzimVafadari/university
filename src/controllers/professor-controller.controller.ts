@@ -18,7 +18,7 @@ import {
   response,
 } from '@loopback/rest';
 import {Professor} from '../models';
-import {ProfessorRepository} from '../repositories';
+import {ManagerRepository, ProfessorRepository} from '../repositories';
 import {inject} from '@loopback/core';
 import {model, property} from '@loopback/repository';
 import {
@@ -31,15 +31,6 @@ import _ from 'lodash';
 import {compare} from 'bcryptjs';
 import {Credentials, MyUserService, TokenServiceBindings, UserRepository, UserServiceBindings} from '@loopback/authentication-jwt';
 import {authenticate, TokenService} from '@loopback/authentication';
-// create NewProfessorRequest model
-@model()
-export class NewProfessorRequest extends Professor {
-  @property({
-    type: 'string',
-    required: true,
-  })
-  password: string;
-}
 
 //create CredentialsSchema
 const CredentialsSchema: SchemaObject = {
@@ -74,6 +65,7 @@ export class ProfessorControllerController {
     public user: UserProfile,
     @repository(UserRepository) protected userRepository: UserRepository,
     @repository(ProfessorRepository) protected professorRepository: ProfessorRepository,
+    @repository(ManagerRepository) protected managerRepository: ManagerRepository,
   ) { }
 
   // @post('/professors')
@@ -218,6 +210,7 @@ export class ProfessorControllerController {
     },
   })
   // And the method is here
+  @authenticate('jwt')
   async login(
     @requestBody(CredentialsRequestBody) credentials: Credentials,
   ): Promise<{token: string}> {
@@ -245,7 +238,7 @@ export class ProfessorControllerController {
 
     return {token};
   }
-
+  @authenticate('jwt')
   @post('/professors/signup', {
     responses: {
       '200': {
@@ -264,28 +257,37 @@ export class ProfessorControllerController {
     @requestBody({
       content: {
         'application/json': {
-          schem1a: getModelSchemaRef(NewProfessorRequest, {
-            title: 'NewStudent',
+         schema: getModelSchemaRef(Professor, {
+            title: 'Newprofessor',
             partial: true,
-            exclude: ['id', 'realm']
+            exclude: ['id', 'realm', 'emailVerified', 'verificationToken']
           }),
         },
       },
     })
-    newProfessorRequest: NewProfessorRequest,
-  ): Promise<Professor> {
-    const password = await hash(newProfessorRequest.password, await genSalt());
-
-    // Create a new student with hashed password
+    professor: Professor,
+    @inject(SecurityBindings.USER)
+    currentUserProfile: UserProfile,
+  ): Promise<any> {
+    const find = await this.managerRepository.findById(currentUserProfile[securityId] as any)
+    const password = await hash(professor.password, await genSalt());
+    professor.password = password;
     const savedProfessor = await this.professorRepository.create(
-      _.omit(newProfessorRequest, 'password', 'id', 'realm'),
+      _.omit(professor, 'realm', 'emailVerified', 'verificationToken')
     );
+    if(find.role === "major"){
+      return savedProfessor;
+    }
+    else{
+      throw new HttpErrors.NotFound('Manager is not major');
+    }
+    // Create a new student with hashed password
 
     // Save the hashed password to your student credentials (adjust as per your model structure)
-    // await this.professorRepository.updateById(savedProfessor.id, {
+    // await this.studentRepository.updateById(savedStudent.studentId, {
     //   password: password,
     // });
 
-    return savedProfessor;
+
   }
 }
