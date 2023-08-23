@@ -26,16 +26,6 @@ import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
 import {Manager, Student} from '../models';
 import {ManagerRepository, StudentRepository} from '../repositories';
-import {compare} from 'bcryptjs';
-
-@model()
-export class NewStudentRequest extends Student {
-  @property({
-    type: 'string',
-    required: true,
-  })
-  password: string;
-}
 
 const CredentialsSchema: SchemaObject = {
   type: 'object',
