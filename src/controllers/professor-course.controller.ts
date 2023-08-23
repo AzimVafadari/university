@@ -39,7 +39,7 @@ export class ProfessorCourseController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Course>,
   ): Promise<Course[]> {
     return this.professorRepository.courses(id.toString()).find(filter);
@@ -54,7 +54,7 @@ export class ProfessorCourseController {
     },
   })
   async create(
-    @param.path.number('id') id: typeof Professor.prototype.id,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -79,7 +79,7 @@ export class ProfessorCourseController {
     },
   })
   async patch(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -102,7 +102,7 @@ export class ProfessorCourseController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Course)) where?: Where<Course>,
   ): Promise<Count> {
     return this.professorRepository.courses(id.toString()).delete(where);

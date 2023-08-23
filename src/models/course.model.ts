@@ -75,7 +75,7 @@ export class Course extends Entity {
   semester: string;
 
   @belongsTo(() => Professor)
-  professorId: number;
+  professorId: string;
 
   @hasMany(() => Enrollment)
   enrollments: Enrollment[];
