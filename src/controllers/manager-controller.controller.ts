@@ -80,75 +80,80 @@ export class ManagerControllerController {
     @repository(ManagerRepository) protected managerRepository: ManagerRepository,
   ) {}
 
-  @post('/managers')
-  @response(200, {
-    description: 'Manager model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Manager)}},
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Manager, {
-            title: 'NewManager',
+  // @post('/managers')
+  // @response(200, {
+  //   description: 'Manager model instance',
+  //   content: {'application/json': {schema: getModelSchemaRef(Manager)}},
+  // })
+  // async create(
+  //   @requestBody({
+    //     content: {
+      //       'application/json': {
+        //         schema: getModelSchemaRef(Manager, {
+          //           title: 'NewManager',
 
-          }),
-        },
-      },
-    })
-    manager: Manager,
-  ): Promise<Manager> {
-    return this.managerRepository.create(manager);
-  }
+          //         }),
+          //       },
+          //     },
+          //   })
+          //   manager: Manager,
+  // ): Promise<Manager> {
+    //   return this.managerRepository.create(manager);
+    // }
 
-  @get('/managers/count')
-  @response(200, {
-    description: 'Manager model count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async count(
-    @param.where(Manager) where?: Where<Manager>,
-  ): Promise<Count> {
-    return this.managerRepository.count(where);
-  }
+// ----------------------------------------------------------------------------------------------------------
 
-  @get('/managers')
-  @response(200, {
-    description: 'Array of Manager model instances',
-    content: {
-      'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Manager, {includeRelations: true}),
-        },
-      },
-    },
-  })
-  async find(
-    @param.filter(Manager) filter?: Filter<Manager>,
-  ): Promise<Manager[]> {
-    return this.managerRepository.find(filter);
-  }
+// @get('/managers/count')
+  // @response(200, {
+  //   description: 'Manager model count',
+  //   content: {'application/json': {schema: CountSchema}},
+  // })
+  // async count(
+  //   @param.where(Manager) where?: Where<Manager>,
+  // ): Promise<Count> {
+  //   return this.managerRepository.count(where);
+  // }
 
-  @patch('/managers')
-  @response(200, {
-    description: 'Manager PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Manager, {partial: true}),
-        },
-      },
-    })
-    manager: Manager,
-    @param.where(Manager) where?: Where<Manager>,
-  ): Promise<Count> {
-    return this.managerRepository.updateAll(manager, where);
-  }
+  // @get('/managers')
+  // @response(200, {
+  //   description: 'Array of Manager model instances',
+  //   content: {
+  //     'application/json': {
+  //       schema: {
+  //         type: 'array',
+  //         items: getModelSchemaRef(Manager, {includeRelations: true}),
+  //       },
+  //     },
+  //   },
+  // })
+  // async find(
+  //   @param.filter(Manager) filter?: Filter<Manager>,
+  // ): Promise<Manager[]> {
+  //   return this.managerRepository.find(filter);
+  // }
 
+// ----------------------------------------------------------------------------------------------------------
+
+  // @patch('/managers')
+  // @response(200, {
+  //   description: 'Manager PATCH success count',
+  //   content: {'application/json': {schema: CountSchema}},
+  // })
+  // async updateAll(
+  //   @requestBody({
+  //     content: {
+  //       'application/json': {
+  //         schema: getModelSchemaRef(Manager, {partial: true}),
+  //       },
+  //     },
+  //   })
+  //   manager: Manager,
+  //   @param.where(Manager) where?: Where<Manager>,
+  // ): Promise<Count> {
+  //   return this.managerRepository.updateAll(manager, where);
+  // }
+
+// 
   @get('/managers/{id}')
   @response(200, {
     description: 'Manager model instance',
