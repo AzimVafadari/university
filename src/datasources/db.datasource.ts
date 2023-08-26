@@ -1,5 +1,8 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
+import { config as dotenvConfig } from "dotenv";
+export * from './index';
+dotenvConfig();
 
 const config = {
   name: 'db',
@@ -7,8 +10,8 @@ const config = {
   url: '',
   host: 'localhost',
   port: 3306,
-  user: 'Azim_Admin',
-  password: 'azim123443218888',
+  user: process.env.User,
+  password: process.env.Password,
   database: 'db_university'
 };
 

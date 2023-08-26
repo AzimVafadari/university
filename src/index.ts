@@ -1,6 +1,9 @@
 import {ApplicationConfig, UniversityApplication} from './application';
+import { config } from "dotenv";
+config();
 
 export {UniversityApplication} from './application';
+
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new UniversityApplication(options);
